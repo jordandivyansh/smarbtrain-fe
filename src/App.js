@@ -20,20 +20,32 @@ function App() {
   const calculateFaceLocation = (data) => {
     const numberOfFace = data.outputs[0].data.regions.length;
     const ClarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+    const ClarifaiFaces = data.outputs[0].data.regions;
     const image = document.getElementById('input-image')
     const width = Number(image.width);
     const height = Number(image.height);
+    const leftColumns = [], rightColumns = [], topRows = [], bottomRows = [];
+    const coordinates = [];
     console.log(ClarifaiFace, width, height, numberOfFace)
+    for(let i = 0; i < numberOfFace; i++){
+      
+      leftColumns.push(data.outputs[0].data.regions[i].region_info.bounding_box.left_col * width);
+      rightColumns.push(width - (data.outputs[0].data.regions[i].region_info.bounding_box.right_col * width));
+      topRows.push(data.outputs[0].data.regions[i].region_info.bounding_box.right_col * height);
+      bottomRows.push(height - (data.outputs[0].data.regions[i].region_info.bounding_box.bottom_row * height));
+    }
+    // const coordinates  = [leftColumns, rightColumns, topRows, bottomRows]
+    console.log("coor", coordinates);
     return{
-      leftCol: ClarifaiFace.left_col * width,
-      topRow: ClarifaiFace.top_row * height,
-      rightCol: width - (ClarifaiFace.right_col * width),
-      bottomRow: height - (ClarifaiFace.bottom_row * height)
+      // leftCol: ClarifaiFace.left_col * width,
+      // topRow: ClarifaiFace.top_row * height,
+      // rightCol: width - (ClarifaiFace.right_col * width),
+      // bottomRow: height - (ClarifaiFace.bottom_row * height)
+      coordinates
     }
   }
 
   const displayFaceBox = (box) => {
-    console.log("bx", box);
     setBox(box)
   }
 
