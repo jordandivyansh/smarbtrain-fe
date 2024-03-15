@@ -1,30 +1,72 @@
 import React from "react";
 import "./FaceRecognition.css";
-const FaceRecognition = ({ imageUrl, box }) => {
-    console.log("passed box", box);
-  if (imageUrl) {
+const FaceRecognition = ({ imageUrl, box, numberOfFaces, error }) => {
+  console.log(numberOfFaces);
+  console.log("err", error);
+  if(error){
     return (
       <div className="center ma pa3">
         <div className="absolute mt2 ma4 grow">
-          <img
-            id="input-image"
-            src={imageUrl}
-            alt="Face"
-            width="500px"
-            height="auto"
-          />
-          <div
-            className="bounding-box"
-            style={{
-              top: box.topRow,
-              left: box.leftCol,
-              right: box.rightCol,
-              bottom: box.bottomRow,
-            }}
-          ></div>
+          <h2>Error, Please check the URL of Image</h2>
         </div>
       </div>
     );
+  }
+  if (imageUrl) {
+    console.log("passed box", box);
+    const coordinates = box.coordinates;
+    console.log(Array.isArray(coordinates),  "check");
+    if (Array.isArray(coordinates)) {
+      return (
+        <div className="center ma pa3">
+          <div className="absolute mt2 ma4 grow">
+            <img
+              id="input-image"
+              src={imageUrl}
+              alt="Face"
+              width="500px"
+              height="auto"
+            />
+            {/* {coordinates.map((coordinate, index) => (
+            <div
+              key={index}
+              className="bounding-box"
+              style={{
+                left: coordinate[0],
+                right: coordinate[1],
+                top: coordinate[2],
+                bottom: coordinate[3],
+              }}>
+                {index + 1}
+              </div>
+          ))} */}
+            <div
+              className="bounding-box"
+              style={{
+                left: coordinates[0][0],
+                right: coordinates[0][1],
+                top: coordinates[0][2],
+                bottom: coordinates[0][3],
+              }}
+            />
+          </div>
+          </div>
+      );
+    } else {
+      return (
+        <div className="center ma pa3">
+          <div className="absolute mt2 ma4 grow">
+            <img
+              id="input-image"
+              src={imageUrl}
+              alt="Face"
+              width="500px"
+              height="auto"
+            />
+          </div>
+        </div>
+      );
+    }
   }
   return (
     <h2 className="white">Please provide URL of an image and click submit</h2>
