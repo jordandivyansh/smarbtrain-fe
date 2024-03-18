@@ -98,7 +98,7 @@ function App() {
       .then((parsedResponse) =>
         displayFaceBox(calculateFaceLocation(parsedResponse))
       )
-      .catch((error) => handleError(error));
+      .catch((err) => handleError(err));
   };
 
   return (
