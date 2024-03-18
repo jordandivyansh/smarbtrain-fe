@@ -6,6 +6,7 @@ import ImageLinkForm from "./components/ImageLinkForm/ImageLinkForm";
 import Rank from "./components/Rank/Rank";
 import ParticlesBg from "particles-bg";
 import FaceRecognition from "./components/FaceRecognition/FaceRecognition";
+import SignIn from "./components/SignIn/SignIn";
 
 const PAT = "fa82bf3b5c5b433995e2183ff69ee2e2";
 const USER_ID = "jordandivyansh";
@@ -17,19 +18,16 @@ function App() {
   const [box, setBox] = useState([]);
   const [error, setError] = useState(false);
   const [numberOfFaces, setNumberFaces] = useState(0);
+  const [route, setRoute] = useState("signIn");
   const calculateFaceLocation = (data) => {
-    if(error)
-    return;
+    if (error) return;
     const faces = data.outputs[0].data.regions.length;
     setNumberFaces(faces);
-    console.log(numberOfFaces);
     const ClarifaiFaces = data.outputs[0].data.regions;
     const image = document.getElementById("input-image");
     const width = Number(image.width);
     const height = Number(image.height);
     const coordinates = [];
-    console.log("w ", width, "h ", height)
-    console.log(ClarifaiFaces,"api data");
     for (let i = 0; i < faces; i++) {
       const leftCol =
         ClarifaiFaces[i].region_info.bounding_box.left_col * width;
@@ -48,7 +46,6 @@ function App() {
   };
 
   const displayFaceBox = (box) => {
-    console.log(box);
     setBox(box);
   };
 
@@ -57,8 +54,8 @@ function App() {
   };
   const [imageUrl, setImageUrl] = useState();
   const handleError = (error) => {
-      setError(true);
-  }
+    setError(true);
+  };
   const onButtonSubmit = () => {
     setError(false);
     setImageUrl(input);
@@ -101,18 +98,33 @@ function App() {
       )
       .catch((err) => handleError(err));
   };
-
+  const onRouteChange = (route) => {
+    setRoute(route);
+  }
   return (
     <div className="App">
+      <signIn />
       <ParticlesBg num={200} type="circle" bg={true} className="particles" />
-      <Navigation />
-      <Logo />
-      <Rank />
-      <ImageLinkForm
-        onInputChange={onInputChange}
-        onButtonSubmit={onButtonSubmit}
-      />
-      <FaceRecognition box={box} imageUrl={imageUrl} error = {error} faces = {numberOfFaces} />
+      {route === "signIn" ? (
+        <SignIn onRouteChange = {onRouteChange} />
+      ) : (
+        <div>
+          <Navigation onRouteChange={onRouteChange} />
+
+          <Logo />
+          <Rank />
+          <ImageLinkForm
+            onInputChange={onInputChange}
+            onButtonSubmit={onButtonSubmit}
+          />
+          <FaceRecognition
+            box={box}
+            imageUrl={imageUrl}
+            error={error}
+            faces={numberOfFaces}
+          />
+        </div>
+      )}
     </div>
   );
 }
