@@ -22,6 +22,7 @@ function App() {
     return;
     const faces = data.outputs[0].data.regions.length;
     setNumberFaces(faces);
+    console.log(numberOfFaces);
     const ClarifaiFaces = data.outputs[0].data.regions;
     const image = document.getElementById("input-image");
     const width = Number(image.width);
