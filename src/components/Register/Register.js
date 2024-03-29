@@ -1,6 +1,41 @@
-import React from "react";
+import React, { useState } from "react";
 
-const Register = ({ onRouteChange }) => {
+const Register = ({ onRouteChange, loadUser }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const onNameChange = (event) => {
+    setName(event.target.value);
+  };
+  const onEmailChange = (event) => {
+    setEmail(event.target.value);
+  };
+  const onPasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
+  const onSubmitRegister = () => {
+    fetch("http://localhost:3001/register", {
+      method: "post",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+        name: name,
+      }),
+    })
+      .then((response) => response.json())
+      .then((user) => {
+        if (user) {
+          loadUser(user);
+          onRouteChange("home");
+        } else {
+          window.alert("error");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
   return (
     <article className="br3 ba black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
       <article className="pa4 black-80">
@@ -17,6 +52,7 @@ const Register = ({ onRouteChange }) => {
                 name="name"
                 id="name"
                 autoComplete="name"
+                onChange={onNameChange}
               />
             </div>
             <div className="mt3">
@@ -29,6 +65,7 @@ const Register = ({ onRouteChange }) => {
                 name="email-address"
                 id="email-address"
                 autoComplete="email-address"
+                onChange={onEmailChange}
               />
             </div>
             <div className="mt3">
@@ -41,6 +78,7 @@ const Register = ({ onRouteChange }) => {
                 name="password"
                 id="password"
                 autoComplete="password"
+                onChange={onPasswordChange}
               />
             </div>
           </fieldset>
@@ -49,7 +87,7 @@ const Register = ({ onRouteChange }) => {
               className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6"
               type="submit"
               value="Register"
-              onClick={() => onRouteChange("home")}
+              onClick={onSubmitRegister}
             />
           </div>
         </form>

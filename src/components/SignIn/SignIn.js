@@ -1,10 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 
 const SignIn = ({ onRouteChange }) => {
+  const [signInEmail, setSignInEmail] = useState("");
+  const [signInPassword, setSignInPassword] = useState("");
+  const onEmailChange = (event) => {
+    setSignInEmail(event.target.value);
+  };
+  const onPasswordChange = (event) => {
+    setSignInPassword(event.target.value);
+  };
+  const onSubmitSignIn = () => {
+    fetch('http://localhost:3001/signIn', {
+      method: 'post',
+      headers: {'content-type': 'application/json'},
+      body:JSON.stringify({
+        email: signInEmail,
+        password: signInPassword
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if(data === 'success'){
+        onRouteChange("home");
+      }
+      else{
+        window.alert("Wrong credentials");
+      }
+    })
+    console.log("email", signInEmail);
+    console.log("password", signInPassword);
+  };
   return (
     <article className="br3 ba black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
       <main className="pa4 black-80">
-        <form className="measure">
+        <div className="measure">
           <fieldset id="sign_up" className="ba b--transparent ph0 mh0">
             <legend className="f1 fw6 ph0 mh0">Sign In</legend>
             <div className="mt3">
@@ -17,6 +46,7 @@ const SignIn = ({ onRouteChange }) => {
                 name="email-address"
                 id="email-address"
                 autoComplete="email-address"
+                onChange={onEmailChange}
               />
             </div>
             <div className="mv3">
@@ -29,6 +59,7 @@ const SignIn = ({ onRouteChange }) => {
                 name="password"
                 id="password"
                 autoComplete="password"
+                onChange={onPasswordChange}
               />
             </div>
           </fieldset>
@@ -37,7 +68,7 @@ const SignIn = ({ onRouteChange }) => {
               className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f3 dib"
               type="submit"
               value="Sign in"
-              onClick={() => onRouteChange("home")}
+              onClick={onSubmitSignIn}
             />
           </div>
           <div className="lh-copy mt3">
@@ -48,7 +79,7 @@ const SignIn = ({ onRouteChange }) => {
               Register{" "}
             </p>
           </div>
-        </form>
+        </div>
       </main>
     </article>
   );

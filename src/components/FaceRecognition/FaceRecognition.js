@@ -1,6 +1,6 @@
 import React from "react";
 import "./FaceRecognition.css";
-const FaceRecognition = ({ imageUrl, box, numberOfFaces, error }) => {
+const FaceRecognition = ({ imageUrl, box, error }) => {
   if (error) {
     return (
       <div className="center ma pa3">

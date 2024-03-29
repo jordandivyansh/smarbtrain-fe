@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import Navigation from "./components/Navigation/Navigation";
 import Logo from "./components/Logo/Logo";
@@ -47,16 +47,31 @@ if (Math.random() > 0.85) {
   });
 }
 function App() {
-  const [input, setInput] = useState();
+  const [input, setInput] = useState('');
   const [box, setBox] = useState([]);
   const [error, setError] = useState(false);
-  const [numberOfFaces, setNumberFaces] = useState(0);
   const [route, setRoute] = useState("signIn");
   const [isSignedIn, setSignedIn] = useState(false);
+  const [user, setUser] = useState({
+    id: '',
+    name: '',
+    email: '',
+    entries: 0,
+    joined: ''
+  });
+  const loadUser = (data) => {
+    setUser({
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      entries: data.entries,
+      joined: data.joined
+    });
+  };
+
   const calculateFaceLocation = (data) => {
     if (error) return;
     const faces = data.outputs[0].data.regions.length;
-    setNumberFaces(faces);
     const ClarifaiFaces = data.outputs[0].data.regions;
     const image = document.getElementById("input-image");
     const width = Number(image.width);
@@ -135,21 +150,20 @@ function App() {
   const onRouteChange = (route) => {
     setRoute(route);
     if (route === "home") setSignedIn(true);
-    else setSignedIn(false);
+    else if(route === "signOut") setSignedIn(false);
+    setRoute(route);
   };
   return (
     <div className="App">
       {route === "home" ? (
         <div>
           <ParticlesBg
-            // num={200}
             type="square"
             bg={true}
-            // className="particles"
           />
           <Navigation onRouteChange={onRouteChange} isSignedIn={isSignedIn} />
           <Logo />
-          <Rank />
+          <Rank name = {user.name} entries ={user.entries}/>
           <ImageLinkForm
             onInputChange={onInputChange}
             onButtonSubmit={onButtonSubmit}
@@ -158,7 +172,6 @@ function App() {
             box={box}
             imageUrl={imageUrl}
             error={error}
-            faces={numberOfFaces}
           />
         </div>
       ) : route === "signIn" || route === "signOut" ? (
@@ -176,7 +189,7 @@ function App() {
             className="particles"
           />
           <Navigation onRouteChange={onRouteChange} isSignedIn={isSignedIn} />
-          <Register onRouteChange={onRouteChange} />
+          <Register onRouteChange={onRouteChange} loadUser={loadUser}/>
         </div>
       )}
     </div>
