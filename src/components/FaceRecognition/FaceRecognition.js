@@ -1,6 +1,7 @@
 import React from "react";
 import "./FaceRecognition.css";
 const FaceRecognition = ({ imageUrl, box, error }) => {
+  console.log(imageUrl, box, error, "divyansh")
   if (error) {
     return (
       <div className="center ma pa3">
@@ -10,7 +11,7 @@ const FaceRecognition = ({ imageUrl, box, error }) => {
       </div>
     );
   }
-  if (imageUrl) {
+  if (imageUrl && box.coordinates) {
     const coordinates = box.coordinates;
     if (Array.isArray(coordinates)) {
       return (

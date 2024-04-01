@@ -10,25 +10,22 @@ const SignIn = ({ onRouteChange }) => {
     setSignInPassword(event.target.value);
   };
   const onSubmitSignIn = () => {
-    fetch('http://localhost:3001/signIn', {
-      method: 'post',
-      headers: {'content-type': 'application/json'},
-      body:JSON.stringify({
+    fetch("http://localhost:3001/signIn", {
+      method: "post",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
         email: signInEmail,
-        password: signInPassword
-      })
+        password: signInPassword,
+      }),
     })
-    .then(response => response.json())
-    .then(data => {
-      if(data === 'success'){
-        onRouteChange("home");
-      }
-      else{
-        window.alert("Wrong credentials");
-      }
-    })
-    console.log("email", signInEmail);
-    console.log("password", signInPassword);
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.email === signInEmail) {
+          onRouteChange("home");
+        } else {
+          window.alert("Wrong credentials");
+        }
+      });
   };
   return (
     <article className="br3 ba black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
@@ -60,6 +57,7 @@ const SignIn = ({ onRouteChange }) => {
                 id="password"
                 autoComplete="password"
                 onChange={onPasswordChange}
+                data-ignore-warning={true}
               />
             </div>
           </fieldset>

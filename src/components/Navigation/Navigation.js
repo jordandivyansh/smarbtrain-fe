@@ -1,7 +1,6 @@
 import React from "react";
 // import Register from "../Register/Register";
 const Navigation = ({ onRouteChange, isSignedIn }) => {
-    console.log(isSignedIn, "hello");
   if (isSignedIn) {
     return (
       <div>
