@@ -43,8 +43,8 @@ if (Math.random() > 0.85) {
 }
 function App() {
   const [input, setInput] = useState("");
-  const [box, setBox] = useState([]);
-  const [error, setError] = useState(false);
+  const [box, setBox] = useState({});
+  // const [error, setError] = useState(false);
   const [route, setRoute] = useState("signIn");
   const [isSignedIn, setSignedIn] = useState(false);
   const [user, setUser] = useState({
@@ -55,6 +55,7 @@ function App() {
     joined: "",
   });
   const loadUser = (data) => {
+    console.log(data);
     setUser({
       id: data.id,
       name: data.name,
@@ -65,31 +66,42 @@ function App() {
   };
 
   const calculateFaceLocation = (data) => {
-    if (error) return;
-    const faces = data.outputs[0].data.regions.length;
-    const ClarifaiFaces = data.outputs[0].data.regions;
+    // if (error) return;
+    // const faces = data.outputs[0].data.regions.length;
+    // const ClarifaiFaces = data.outputs[0].data.regions;
+    const clarifaiFace =
+      data.outputs[0].data.regions[0].region_info.bounding_box;
     const image = document.getElementById("input-image");
     const width = Number(image.width);
     const height = Number(image.height);
-    const coordinates = [];
-    for (let i = 0; i < faces; i++) {
-      const leftCol =
-        ClarifaiFaces[i].region_info.bounding_box.left_col * width;
-      const rightCol =
-        width - ClarifaiFaces[i].region_info.bounding_box.right_col * width;
-      const topRow =
-        ClarifaiFaces[i].region_info.bounding_box.right_col * height;
-      const bottomRow =
-        height - ClarifaiFaces[i].region_info.bounding_box.bottom_row * height;
-
-      coordinates.push([leftCol, rightCol, topRow, bottomRow]);
-    }
     return {
-      coordinates,
+      leftCol: clarifaiFace.left_col * width,
+      topRow: clarifaiFace.top_row * height,
+      rightCol: width - clarifaiFace.right_col * width,
+      bottomRow: height - clarifaiFace.bottom_row * height,
     };
+    // for multi face input
+
+    // const coordinates = [];
+    // for (let i = 0; i < faces; i++) {
+    //   const leftCol =
+    //     ClarifaiFaces[i].region_info.bounding_box.left_col * width;
+    //   const rightCol =
+    //     width - ClarifaiFaces[i].region_info.bounding_box.right_col * width;
+    //   const topRow =
+    //     ClarifaiFaces[i].region_info.bounding_box.right_col * height;
+    //   const bottomRow =
+    //     height - ClarifaiFaces[i].region_info.bounding_box.bottom_row * height;
+
+    //   coordinates.push([leftCol, rightCol, topRow, bottomRow]);
+    // }
+    // return {
+    //   coordinates,
+    // };
   };
 
   const displayFaceBox = (box) => {
+    // console.log(box);
     setBox(box);
   };
 
@@ -97,33 +109,80 @@ function App() {
     setInput(event.target.value);
   };
   const [imageUrl, setImageUrl] = useState();
-  const handleError = (error) => {
-    setError(true);
-  };
+  // const handleError = (error) => {
+  //   setError(true);
+  // };
   const onButtonSubmit = () => {
-    setError(false);
+    if (input === imageUrl) {
+      window.alert("Please change the image URL input.");
+      return;
+    }
+    // setError(false);
     setImageUrl(input);
     fetch("http://localhost:3001/imageUrl", {
-      method: 'post',
-      headers: {'Content-Type':'application/json'},
+      method: "post",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        input: imageUrl
-      })
+        input: input,
+      }),
     })
-      .then((response) => response.json())
-      .then((parsedResponse) =>
-        displayFaceBox(calculateFaceLocation(parsedResponse))
-      )
-      .catch((err) => handleError(err));
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch");
+        }
+        return response.json();
+      })
+      .then((parsedResponse) => {
+        displayFaceBox(calculateFaceLocation(parsedResponse));
+        fetch("http://localhost:3001/image", {
+          method: "put",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: user.id,
+          }),
+        })
+          .then((response) => response.json())
+          .then((entries) => {
+            setUser({
+              entries: entries,
+              id: user.id,
+              name: user.name,
+            });
+          });
+      })
+      .catch((err) => {
+        console.error(err);
+        window.alert(
+          "Input provided is not image url. Failed to fetch data. Please try again later."
+        );
+      });
+    // .then((response) => response.json())
+    // .then((parsedResponse) => {
+    //   displayFaceBox(calculateFaceLocation(parsedResponse));
+    // })
+    // .catch((err) => console.error(err));
   };
   const onRouteChange = (route) => {
     setRoute(route);
-    if (route === "home") setSignedIn(true);
-    else if (route === "signOut") {
+    if (route === "home") {
+      setSignedIn(true);
+      // fetch("http://localhost:3001/image", {
+      //     method: "put",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify({
+      //       id: user.id,
+      //     }),
+      //   })
+      //     .then((response) => {response.json()
+      //     console.log(response)})
+      //     .then((count) => {
+      //       Object.assign(user, { entries: count });
+      //     });
+    } else if (route === "signOut") {
       setSignedIn(false);
       setInput("");
       setBox([]);
-      setError(false);
+      // setError(false);
       setRoute("signIn");
       setSignedIn(false);
       setUser({
@@ -143,18 +202,19 @@ function App() {
           <ParticlesBg type="square" bg={true} />
           <Navigation onRouteChange={onRouteChange} isSignedIn={isSignedIn} />
           <Logo />
-          <Rank name={user.name} entries={user.entries} />
+          <Rank user={user.name} entries={user.entries} />
           <ImageLinkForm
             onInputChange={onInputChange}
             onButtonSubmit={onButtonSubmit}
           />
-          <FaceRecognition box={box} imageUrl={imageUrl} error={error} />
+          <FaceRecognition box={box} imageUrl={imageUrl} />
+          {/* <FaceRecognition box={box} imageUrl={imageUrl} error={error} /> */}
         </div>
       ) : route === "signIn" || route === "signOut" ? (
         <div>
           <Navigation onRouteChange={onRouteChange} isSignedIn={isSignedIn} />
           <ParticlesBg config={config} type="custom" bg={true} />
-          <SignIn onRouteChange={onRouteChange} />
+          <SignIn onRouteChange={onRouteChange} loadUser={loadUser} />
         </div>
       ) : (
         <div>

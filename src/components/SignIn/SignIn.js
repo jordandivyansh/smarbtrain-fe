@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const SignIn = ({ onRouteChange }) => {
+const SignIn = ({ onRouteChange, loadUser }) => {
   const [signInEmail, setSignInEmail] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
   const onEmailChange = (event) => {
@@ -21,6 +21,7 @@ const SignIn = ({ onRouteChange }) => {
       .then((response) => response.json())
       .then((data) => {
         if (data.email === signInEmail) {
+          loadUser(data);
           onRouteChange("home");
         } else {
           window.alert("Wrong credentials");
