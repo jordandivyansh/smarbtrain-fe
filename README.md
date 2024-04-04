@@ -1,5 +1,22 @@
 # Getting Started with Create React App
 
+
+This React web application is designed to identify faces from image URLs while offering user registration and sign-in functionalities. Each user gains access to an individual profile, tracking the count of image URL submissions.
+
+Frontend:
+
+Developed using React.js, featuring a responsive web design with reusable components such as Navigation, Register, Login, and Image Recognition Box.
+Leverages key React concepts including props, state management, life-cycle management, event handling, conditional rendering, form implementation, and error handling.
+Backend:
+
+Powered by Node.js and Express.js, the backend server supports face detection using the ClariFai Face API.
+Utilizes PostGreSQL for backend database storage.
+Implements Knex for querying registered user details and validating user login credentials.
+For more details, refer to the following GitHub repositories:
+Frontend Code: [GitHub_Repository](https://github.com/jordandivyansh/smarbtrain-fe)
+Backend Code: [GitHub_Repository](https://github.com/jordandivyansh/smarbrain-backend)
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
